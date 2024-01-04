@@ -30,11 +30,9 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: 🔨 Rust Build
-        id: rust-build
         run: cargo build --release
 
       - name: 🔨 Rust Build (aarch64)
-        id: rust-build
         run: cargo build --release --target aarch64-apple-darwin
 
       - name: create universal binary
