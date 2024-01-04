@@ -1,0 +1,50 @@
+name: Build CLI
+
+env:
+  CARGO_TERM_COLOR: always
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-cli-macos:
+    runs-on: macos-latest
+
+    name: Build CLI
+
+    steps:
+      - name: 📂 Checkout Repository
+        id: checkout-repository
+        uses: actions/checkout@v3
+
+      - name: 🧰 Install Rust Toolchain [Stable]
+        id: rust-toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          cache: false
+          target: aarch64-apple-darwin
+
+      - name: 📥 Configure Rust cache
+        id: cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: 🔨 Rust Build
+        id: rust-build
+        run: cargo build --release
+
+      - name: 🔨 Rust Build (aarch64)
+        id: rust-build
+        run: cargo build --release --target aarch64-apple-darwin
+
+      - name: create universal binary
+        run: lipo -create -output ./target/testapp ./target/release/testapp ./target/aarch64-apple-darwin/release/testapp
+
+      - name: 📤 Upload Artifact bin
+        id: upload-artifact-unix
+        uses: actions/upload-artifact@v3
+        with:
+          name: testapp
+          path: ./target/testapp
+          retention-days: 7
+          if-no-files-found: error
